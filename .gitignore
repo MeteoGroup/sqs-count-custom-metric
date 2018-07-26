@@ -1,3 +1,6 @@
 *.prv
 *.pub
 version.txt
+.idea
+*.iml
+

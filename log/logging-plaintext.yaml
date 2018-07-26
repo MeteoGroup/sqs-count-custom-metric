@@ -1,0 +1,36 @@
+version: 1
+disable_existing_loggers: False
+formatters:
+  standard:
+    format: '%(asctime)s: %(name)s, %(datatype_level_1)s | %(levelname)s | %(message)s (%(filename)s, ln. %(lineno)d)'
+handlers:
+  default:
+    level: DEBUG
+    formatter: standard
+    filters: [plaintext_filter]
+    class: logging.StreamHandler
+loggers:
+  '':
+    handlers:
+      - default
+    level: DEBUG
+    propagate: True
+  boto3:
+    handlers:
+      - default
+    level: WARNING
+    propagate: True
+  botocore:
+    handlers:
+      - default
+    level: WARNING
+    propagate: True
+  sqlalchemy.engine:
+    handlers:
+      - default
+    level: WARNING
+    propagate: True
+
+filters:
+  plaintext_filter:
+    (): log.PlaintextFilter.PlaintextFilter

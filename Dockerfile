@@ -1,8 +1,6 @@
 FROM python:3-alpine
 
-RUN apk update && \
-    pip install --no-cache-dir boto3 && \
-    rm -f /var/cache/apk/*
+RUN pip install --no-cache-dir boto3 pyaml python-json-logger
 
 WORKDIR /opt/app
 COPY . .

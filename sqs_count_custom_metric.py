@@ -1,41 +1,46 @@
 import logging
 import os
-import sys
 import time
 
 import boto3
 
+from log.LoggingInitializer import LoggingInitializer
+
 
 def main():
-    logging.basicConfig(
-        level=logging.DEBUG,
-        format="[%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] "
-               "%(message)s",
-        datefmt="%H:%M:%S",
-        stream=sys.stdout
-    )
-    logging.getLogger('boto').setLevel(logging.ERROR)
-    logging.getLogger('boto3').setLevel(logging.ERROR)
-    logging.getLogger('botocore').setLevel(logging.ERROR)
-    logger = logging.getLogger()
-    logger.setLevel(logging.DEBUG)
+    LoggingInitializer.setup_once()
+    log_level = os.getenv("LOG_LEVEL", logging.INFO)
+    logger = logging.getLogger(__name__)
+    logger.setLevel(log_level)
 
     wait_time_in_seconds = int(os.getenv("WAIT_TIME_IN_SECONDS", 10))
     queue_name = os.getenv("QUEUE_NAME")
     environment = os.getenv("ENVIRONMENT") \
         or os.getenv('stage') \
         or os.getenv('env')
-    namespace = os.getenv("METRIC_NAMESPACE")
+    namespace = os.getenv("METRICS_NAMESPACE")
+
+    logger.info("Starting up with "
+                "WAIT_TIME_IN_SECONDS: {} | "
+                "QUEUE_NAME: {} | "
+                "ENVIRONMENT: {} | "
+                "METRICS_NAMESPACE: {}".format(
+                    wait_time_in_seconds,
+                    queue_name,
+                    environment,
+                    namespace
+    ))
 
     while True:
         try:
-            sqs_count_custom_metric(queue_name, environment, namespace)
+            sqs_count_custom_metric(queue_name, environment,
+                                    namespace, log_level)
         except Exception as e:
             logger.error(str(e))
         time.sleep(wait_time_in_seconds)
 
 
-def sqs_count_custom_metric(queue_name, environment, namespace):
+def sqs_count_custom_metric(queue_name, environment, namespace, log_level):
     sqs = boto3.resource('sqs')
     cloudwatch = boto3.client('cloudwatch')
 
@@ -64,9 +69,11 @@ def sqs_count_custom_metric(queue_name, environment, namespace):
         ],
         Namespace=namespace
     )
-    logging.getLogger().debug("Sent another probe: "
-                              "ApproximateNumberOfMessages = {}"
-                              .format(msg_count))
+    logger = logging.getLogger(__name__)
+    logger.setLevel(log_level)
+    logger.debug("Sent another probe to {}: "
+                 "ApproximateNumberOfMessages = {}"
+                 .format(namespace, msg_count))
     return msg_count
 
 

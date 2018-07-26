@@ -1,0 +1,37 @@
+version: 1
+disable_existing_loggers: False
+formatters:
+  json:
+    (): pythonjsonlogger.jsonlogger.JsonFormatter
+    format: '%(asctime)s %(name)s %(pathname)s %(lineno) %(funcName)s %(processName)s %(process)d %(threadName)s %(thread)d %(levelname)s %(levelno)d %(message)s'
+handlers:
+  json:
+    level: DEBUG
+    formatter : json
+    filters: [json_filter]
+    class: logging.StreamHandler
+loggers:
+  '':
+    handlers:
+      - json
+    level: DEBUG
+    propagate: True
+  boto3:
+    handlers:
+      - json
+    level: WARNING
+    propagate: True
+  botocore:
+    handlers:
+      - json
+    level: WARNING
+    propagate: True
+  sqlalchemy.engine:
+    handlers:
+      - json
+    level: WARNING
+    propagate: False
+
+filters:
+  json_filter:
+    (): log.JsonFilter.JsonFilter

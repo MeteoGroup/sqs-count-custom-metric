@@ -34,4 +34,6 @@ when a container is run:
 | WAIT_TIME_IN_SECONDS | This is the wait time inbetween subsequent calls to the queue and defines the resolution of the metric. 10s = roughly 6 datapoints per minute, but beware of the runtime of queue-attribute poll and metrics push. |
 | QUEUE_NAME | The queue in question. This will show up as dimension ``QueueName`` in the metrics |
 | ENVIRONMENT | This will show up as dimension ``env`` in the metrics and supports different metrics for dev, prod and other stages |
-| METRIC_NAMESPACE|Namespace for the custom metrics. |
+| METRICS_NAMESPACE|Namespace for the custom metrics. |
+| LOG_LEVEL | Default is ``INFO``, ``DEBUG`` will emit a message each loop |
+| LOG_FORMAT | Default is plaintext, ``json`` will emit JSON which might be handy for a log aggregator. There are quite a few other environment variables picked up for logging, which might need to get adjusted in the code if desired. | 
